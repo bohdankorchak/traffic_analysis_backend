@@ -1,7 +1,23 @@
 from fastapi import FastAPI
-from app.controllers import traffic_controller, route_controller
+
+from backend.app.models import init_db
+from controllers import traffic_controller, route_controller
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
+
+@app.on_event("startup")
+async def on_startup():
+    await init_db()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Замініть на конкретні домени, якщо необхідно
+    allow_credentials=True,
+    allow_methods=["*"],  # Дозволяє всі методи (GET, POST, PUT тощо)
+    allow_headers=["*"],  # Дозволяє всі заголовки
+)
 
 app.include_router(traffic_controller.router)
 app.include_router(route_controller.router)

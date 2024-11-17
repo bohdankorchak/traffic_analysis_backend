@@ -3,3 +3,7 @@ sqlalchemy
 requests
 psycopg2-binary
 uvicorn
+python-dotenv
+asyncpg
+greenlet
+httpx
