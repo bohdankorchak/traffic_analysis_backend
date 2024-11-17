@@ -1,3 +1,14 @@
-from .traffic_model import Traffic
-from .route_model import Route
-from .user_model import User
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.declarative import declarative_base
+from backend.app.config import Config
+
+Base = declarative_base()
+
+
+async def init_db():
+    """
+    Ініціалізація бази даних: створення таблиць.
+    """
+    async_engine = create_async_engine(Config.DATABASE_URL, echo=True)
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
