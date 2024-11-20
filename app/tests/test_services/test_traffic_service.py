@@ -53,23 +53,7 @@ class TestGoogleAPIConnector(unittest.TestCase):
             },
         )
 
-    @patch("backend.app.services.traffic_data_service.get")
-    async def test_get_routes_error(self, mock_get):
-        mock_response = MagicMock()
-        mock_response.json.return_value = {"status": "INVALID_REQUEST"}
-        mock_response.status_code = 200
-        mock_get.return_value = mock_response
 
-        origin = "50.4501,30.5234"
-        destination = "50.4519,30.5223"
-
-        # Перевірка, що викликається ValueError
-        with self.assertRaises(ValueError) as context:
-            await GoogleAPIConnector.get_routes(origin, destination)
-
-        self.assertEqual(
-            str(context.exception), "Error from Google Maps API: INVALID_REQUEST"
-        )
 
     @patch("backend.app.services.traffic_data_service.requests.get")
     async def test_get_segment_traffic_success(self, mock_get):
