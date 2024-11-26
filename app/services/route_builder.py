@@ -1,21 +1,27 @@
+from typing import Tuple, List, Dict
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from backend.app.models.route_model import save_route_to_db, save_segment_to_db
+from backend.app.services.traffic_data_service import TrafficAPIConnector
 from backend.app.services.utils import decode_polyline
-from backend.app.services.traffic_data_service import GoogleAPIConnector
 
 
 class RouteBuilder:
 
-    async def build_routes(self, origin: tuple, destination: tuple, db_session):
+    def __init__(self, api_connector: TrafficAPIConnector):
+        self.api_connector = api_connector
+
+    async def build_routes(self, origin: Tuple[float, float], destination: Tuple[float, float], db_session: AsyncSession) -> List[Dict]:
         origin_str = f"{origin[0]},{origin[1]}"
         destination_str = f"{destination[0]},{destination[1]}"
 
-        routes = await GoogleAPIConnector.get_routes(origin_str, destination_str)
+        routes = await self.api_connector.get_routes(origin_str, destination_str)
         processed_routes = []
         for route in routes:
             route_segments = []
             for leg in route["legs"]:
                 await save_route_to_db(leg, db_session)
-                route_segments = await self.prepare_segments(leg["steps"],  db_session)
+                route_segments = await self.prepare_segments(leg["steps"], db_session)
 
             processed_routes.append({
                 "summary": route["summary"],
@@ -26,23 +32,21 @@ class RouteBuilder:
 
         return processed_routes
 
-    async def prepare_segments(self, steps,  db_session):
+    async def prepare_segments(self, steps: List[Dict], db_session: AsyncSession) -> List[Dict]:
         route_segments = []
         for step in steps:
             start_location = f'{step["start_location"]["lat"]},{step["start_location"]["lng"]}'
             end_location = f'{step["end_location"]["lat"]},{step["end_location"]["lng"]}'
 
-            traffic_data = await GoogleAPIConnector.get_segment_traffic(
-                start_location, end_location
-            )
+            traffic_data = await self.api_connector.get_segment_traffic(start_location, end_location)
 
             duration_in_traffic = traffic_data["duration_in_traffic"]["value"]
             normal_duration = traffic_data["duration"]["value"]
             if normal_duration > 0:
                 traffic_ratio = duration_in_traffic / normal_duration
-                if traffic_ratio > 1.4:
+                if traffic_ratio > 1.45:
                     color = "red"
-                elif 1.25 <= traffic_ratio <= 1.4:
+                elif 1.3 <= traffic_ratio <= 1.45:
                     color = "yellow"
                 else:
                     color = "green"
@@ -62,4 +66,3 @@ class RouteBuilder:
             route_segments.append({"polyline": polyline, "color": color})
 
         return route_segments
-
