@@ -9,6 +9,7 @@
 import unittest
 from unittest.mock import patch, AsyncMock
 from backend.app.services.route_builder import RouteBuilder
+from backend.app.services.traffic_data_service import GoogleAPIConnector
 
 
 class TestRouteBuilder(unittest.IsolatedAsyncioTestCase):
@@ -55,7 +56,7 @@ class TestRouteBuilder(unittest.IsolatedAsyncioTestCase):
 
         mock_decode_polyline.return_value = [(50.4501, 30.5234), (50.4519, 30.5223)]
 
-        route_builder = RouteBuilder()
+        route_builder = RouteBuilder(GoogleAPIConnector())
 
         origin = (50.4501, 30.5234)
         destination = (50.4519, 30.5223)
@@ -112,7 +113,7 @@ class TestRouteBuilder(unittest.IsolatedAsyncioTestCase):
         }
 
         # Ініціалізація RouteBuilder
-        route_builder = RouteBuilder()
+        route_builder = RouteBuilder(GoogleAPIConnector())
 
         # Виклик методу build_routes
         origin = (50.4501, 30.5234)
