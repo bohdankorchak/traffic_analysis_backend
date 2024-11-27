@@ -5,6 +5,14 @@ from ..models.route_model import save_route_to_db, save_segment_to_db
 from ..services.traffic_data_service import TrafficAPIConnector
 from ..services.utils import decode_polyline
 
+HIGH_TRAFFIC_THRESHOLD = 1.45
+MEDIUM_TRAFFIC_THRESHOLD = 1.3
+TRAFFIC_COLORS = {
+    "high": "red",
+    "medium": "yellow",
+    "low": "green",
+    "default": "blue"
+}
 
 class RouteBuilder:
 
@@ -44,14 +52,14 @@ class RouteBuilder:
             normal_duration = traffic_data["duration"]["value"]
             if normal_duration > 0:
                 traffic_ratio = duration_in_traffic / normal_duration
-                if traffic_ratio > 1.45:
-                    color = "red"
-                elif 1.3 <= traffic_ratio <= 1.45:
-                    color = "yellow"
+                if traffic_ratio > HIGH_TRAFFIC_THRESHOLD:
+                    color = TRAFFIC_COLORS["high"]
+                elif MEDIUM_TRAFFIC_THRESHOLD <= traffic_ratio <= HIGH_TRAFFIC_THRESHOLD:
+                    color = TRAFFIC_COLORS["medium"]
                 else:
-                    color = "green"
+                    color = TRAFFIC_COLORS["low"]
             else:
-                color = "blue"
+                color = TRAFFIC_COLORS["default"]
 
             polyline = decode_polyline(step["polyline"]["points"])
 
