@@ -50,16 +50,8 @@ class RouteBuilder:
 
             duration_in_traffic = traffic_data["duration_in_traffic"]["value"]
             normal_duration = traffic_data["duration"]["value"]
-            if normal_duration > 0:
-                traffic_ratio = duration_in_traffic / normal_duration
-                if traffic_ratio > HIGH_TRAFFIC_THRESHOLD:
-                    color = TRAFFIC_COLORS["high"]
-                elif MEDIUM_TRAFFIC_THRESHOLD <= traffic_ratio <= HIGH_TRAFFIC_THRESHOLD:
-                    color = TRAFFIC_COLORS["medium"]
-                else:
-                    color = TRAFFIC_COLORS["low"]
-            else:
-                color = TRAFFIC_COLORS["default"]
+
+            color = self.determine_traffic_color(normal_duration, duration_in_traffic)
 
             polyline = decode_polyline(step["polyline"]["points"])
 
@@ -74,3 +66,14 @@ class RouteBuilder:
             route_segments.append({"polyline": polyline, "color": color})
 
         return route_segments
+
+    def determine_traffic_color(self, normal_duration: int, duration_in_traffic: int) -> str:
+        if normal_duration > 0:
+            traffic_ratio = duration_in_traffic / normal_duration
+            if traffic_ratio > HIGH_TRAFFIC_THRESHOLD:
+                return TRAFFIC_COLORS["high"]
+            elif MEDIUM_TRAFFIC_THRESHOLD <= traffic_ratio <= HIGH_TRAFFIC_THRESHOLD:
+                return TRAFFIC_COLORS["medium"]
+            else:
+                return TRAFFIC_COLORS["low"]
+        return TRAFFIC_COLORS["default"]
