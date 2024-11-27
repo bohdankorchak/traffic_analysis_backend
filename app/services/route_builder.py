@@ -44,9 +44,9 @@ class RouteBuilder:
             normal_duration = traffic_data["duration"]["value"]
             if normal_duration > 0:
                 traffic_ratio = duration_in_traffic / normal_duration
-                if traffic_ratio > 1.45:
+                if traffic_ratio > 1.7:
                     color = "red"
-                elif 1.3 <= traffic_ratio <= 1.45:
+                elif 1.4 <= traffic_ratio <= 1.7:
                     color = "yellow"
                 else:
                     color = "green"
