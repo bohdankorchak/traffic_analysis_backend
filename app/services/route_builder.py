@@ -1,3 +1,4 @@
+import asyncio
 from typing import Tuple, List, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -5,8 +6,8 @@ from ..models.route_model import save_route_to_db, save_segment_to_db
 from ..services.traffic_data_service import TrafficAPIConnector
 from ..services.utils import decode_polyline
 
-HIGH_TRAFFIC_THRESHOLD = 1.45
-MEDIUM_TRAFFIC_THRESHOLD = 1.3
+HIGH_TRAFFIC_THRESHOLD = 1.7
+MEDIUM_TRAFFIC_THRESHOLD = 1.4
 TRAFFIC_COLORS = {
     "high": "red",
     "medium": "yellow",
@@ -41,12 +42,15 @@ class RouteBuilder:
         return processed_routes
 
     async def prepare_segments(self, steps: List[Dict], db_session: AsyncSession) -> List[Dict]:
-        route_segments = []
-        for step in steps:
+        async def fetch_traffic_data(step: Dict):
             start_location = f'{step["start_location"]["lat"]},{step["start_location"]["lng"]}'
             end_location = f'{step["end_location"]["lat"]},{step["end_location"]["lng"]}'
+            return await self.api_connector.get_segment_traffic(start_location, end_location)
 
-            traffic_data = await self.api_connector.get_segment_traffic(start_location, end_location)
+        traffic_data_list = await asyncio.gather(*[fetch_traffic_data(step) for step in steps])
+
+        route_segments = []
+        for step, traffic_data in zip(steps, traffic_data_list):
 
             duration_in_traffic = traffic_data["duration_in_traffic"]["value"]
             normal_duration = traffic_data["duration"]["value"]
