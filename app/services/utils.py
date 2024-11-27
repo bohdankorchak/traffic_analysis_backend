@@ -1,3 +1,8 @@
+class Coordinates:
+    def __init__(self, lat: float, lng: float):
+        self.lat = lat
+        self.lng = lng
+
 def decode_polyline(encoded):
     points = []
     index = lat = lng = 0

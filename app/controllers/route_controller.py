@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..db import get_async_session
 from ..services.route_builder import RouteBuilder
 from ..services.traffic_data_service import GoogleAPIConnector
+from ..services.utils import Coordinates
 
 router = APIRouter()
 
@@ -19,7 +20,7 @@ async def get_routes(
     try:
         traffic_api_connector = GoogleAPIConnector()
         route_builder = RouteBuilder(traffic_api_connector)
-        routes = await route_builder.build_routes(origin, destination, db_session)
+        routes = await route_builder.build_routes(Coordinates(*origin), Coordinates(*destination), db_session)
         return {"status": "success", "routes": routes}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

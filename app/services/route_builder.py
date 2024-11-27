@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models.route_model import save_route_to_db, save_segment_to_db
 from ..services.traffic_data_service import TrafficAPIConnector
-from ..services.utils import decode_polyline
+from ..services.utils import decode_polyline, Coordinates
 
 HIGH_TRAFFIC_THRESHOLD = 1.7
 MEDIUM_TRAFFIC_THRESHOLD = 1.4
@@ -20,9 +20,9 @@ class RouteBuilder:
     def __init__(self, api_connector: TrafficAPIConnector):
         self.api_connector = api_connector
 
-    async def build_routes(self, origin: Tuple[float, float], destination: Tuple[float, float], db_session: AsyncSession) -> List[Dict]:
-        origin_str = f"{origin[0]},{origin[1]}"
-        destination_str = f"{destination[0]},{destination[1]}"
+    async def build_routes(self, origin: Coordinates, destination: Coordinates, db_session: AsyncSession) -> List[Dict]:
+        origin_str = f"{origin.lat},{origin.lng}"
+        destination_str = f"{destination.lat},{destination.lng}"
 
         routes = await self.api_connector.get_routes(origin_str, destination_str)
         processed_routes = []

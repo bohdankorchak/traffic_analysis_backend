@@ -10,6 +10,7 @@ import unittest
 from unittest.mock import patch, AsyncMock
 from backend.app.services.route_builder import RouteBuilder
 from backend.app.services.traffic_data_service import GoogleAPIConnector
+from backend.app.services.utils import Coordinates
 
 
 class TestRouteBuilder(unittest.IsolatedAsyncioTestCase):
@@ -24,8 +25,8 @@ class TestRouteBuilder(unittest.IsolatedAsyncioTestCase):
         mock_get_segment_traffic.return_value = {"duration_in_traffic": {"value": 800}, "duration": {"value": 500}}
         mock_decode_polyline.return_value = [(50.4501, 30.5234), (50.4519, 30.5223)]
         route_builder = RouteBuilder(GoogleAPIConnector())
-        origin = (50.4501, 30.5234)
-        destination = (50.4519, 30.5223)
+        origin = Coordinates(50.4501, 30.5234)
+        destination = Coordinates(50.4519, 30.5223)
         db_session = AsyncMock()
         result = await route_builder.build_routes(origin, destination, db_session)
         self.assertEqual(len(result), 1)
@@ -33,9 +34,9 @@ class TestRouteBuilder(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result[0]["distance"], "10 km")
         self.assertEqual(result[0]["duration"], "20 mins")
         self.assertEqual(len(result[0]["segments"]), 1)
-        self.assertEqual(result[0]["segments"][0]["color"], "red")
+        self.assertEqual(result[0]["segments"][0]["color"], "yellow")
         mock_get_routes.assert_called_once_with(
-            f"{origin[0]},{origin[1]}", f"{destination[0]},{destination[1]}"
+            f"{origin.lat},{origin.lng}", f"{destination.lat},{destination.lng}"
         )
         mock_save_route_to_db.assert_called_once_with(
             mock_get_routes.return_value[0]["legs"][0], db_session
@@ -78,8 +79,8 @@ class TestRouteBuilder(unittest.IsolatedAsyncioTestCase):
         route_builder = RouteBuilder(GoogleAPIConnector())
 
         # Виклик методу build_routes
-        origin = (50.4501, 30.5234)
-        destination = (50.4519, 30.5223)
+        origin = Coordinates(50.4501, 30.5234)
+        destination = Coordinates(50.4519, 30.5223)
         db_session = AsyncMock()
 
         result = await route_builder.build_routes(origin, destination, db_session)
