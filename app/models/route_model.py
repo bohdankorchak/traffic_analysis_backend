@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, Float, String, DateTime
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
 
-from backend.app.models import Base
+from ..models import Base
 
 
 class Route(Base):

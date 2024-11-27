@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from backend.app.models import init_db
-from controllers import traffic_controller, route_controller
+from backend.app.controllers import traffic_controller, route_controller
 from fastapi.middleware.cors import CORSMiddleware
 
 

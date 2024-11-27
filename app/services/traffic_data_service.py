@@ -1,5 +1,5 @@
 import requests
-from backend.app.config import Config
+from ..config import Config
 
 from typing import List, Tuple, Dict
 
@@ -9,6 +9,9 @@ class TrafficAPIConnector:
     BASE_URL = ""
 
     async def get_routes(self, origin: str, destination: str, alternatives: bool = True, departure_time: str = "now") -> List[Dict]:
+        raise NotImplementedError("This method must be implemented by subclasses.")
+
+    async def get_segment_traffic(self, start_location: str, end_location: str, departure_time: str = "now"):
         raise NotImplementedError("This method must be implemented by subclasses.")
 
 

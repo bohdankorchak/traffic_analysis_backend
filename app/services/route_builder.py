@@ -1,9 +1,9 @@
 from typing import Tuple, List, Dict
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.models.route_model import save_route_to_db, save_segment_to_db
-from backend.app.services.traffic_data_service import TrafficAPIConnector
-from backend.app.services.utils import decode_polyline
+from ..models.route_model import save_route_to_db, save_segment_to_db
+from ..services.traffic_data_service import TrafficAPIConnector
+from ..services.utils import decode_polyline
 
 
 class RouteBuilder:

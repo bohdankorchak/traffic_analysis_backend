@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
-from backend.app.config import Config
+from ..config import Config
 
 Base = declarative_base()
 
