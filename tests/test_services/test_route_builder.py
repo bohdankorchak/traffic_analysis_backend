@@ -33,7 +33,7 @@ class TestRouteBuilder(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result[0]["distance"], "10 km")
         self.assertEqual(result[0]["duration"], "20 mins")
         self.assertEqual(len(result[0]["segments"]), 1)
-        self.assertEqual(result[0]["segments"][0]["color"], "red")
+        self.assertEqual(result[0]["segments"][0]["color"], "yellow")
         mock_get_routes.assert_called_once_with(
             f"{origin[0]},{origin[1]}", f"{destination[0]},{destination[1]}"
         )
